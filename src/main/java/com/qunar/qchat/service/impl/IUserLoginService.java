@@ -116,10 +116,7 @@ public class IUserLoginService implements IUserLogin {
             return null;
         }
         try {
-            BASE64Decoder decoder = new BASE64Decoder();
-            byte[] baseDecode = decoder.decodeBuffer(encodePassword);
-            String res = new String(baseDecode);
-            return RSAEncrypt.decrypt(res, RSA_PRIVATE);
+            return RSAEncrypt.decrypt(encodePassword, RSA_PRIVATE);
         } catch (Exception e) {
             LOGGER.error("decode password error encode password {}", encodePassword, e);
             return null;
