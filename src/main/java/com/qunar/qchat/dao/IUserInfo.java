@@ -3,6 +3,9 @@ package com.qunar.qchat.dao;
 
 import com.qunar.qchat.dao.model.UserInfoQtalk;
 import com.qunar.qchat.dao.model.UserPasswordModel;
+import com.qunar.qchat.model.MucRoomUserInfo;
+import com.qunar.qchat.model.UserInfo;
+import com.qunar.qchat.model.UserInfoParam;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
@@ -85,4 +88,9 @@ public interface IUserInfo {
     int insertOrUpdateDep(@Param("depName") String depName, @Param("depLevel") int depLevel, @Param("parentId") int parentId);
 
     UserPasswordModel getUserPassword(@Param("param") String param,@Param("host")String host);
+
+    List<UserInfo> selectUserInfo (
+            @Param("users") List<UserInfoParam.UsersEntity> users);
+
+    int selectMucRoomUsersCount(MucRoomUserInfo mucRoomUserInfo);
 }
