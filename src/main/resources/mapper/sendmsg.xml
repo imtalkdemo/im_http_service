@@ -5,15 +5,6 @@
 
 <mapper namespace="com.qunar.qchat.dao.ISendMsgDao">
 
-    <resultMap id="BaseResultMap" type="com.qunar.qchat.model.SendWhiteModel">
-        <id column="id" property="id" jdbcType="BIGINT"/>
-        <result column="appcode" property="appcode" jdbcType="VARCHAR"/>
-        <result column="ip_list" property="ip" jdbcType="ARRAY"
-                typeHandler="com.qunar.qchat.handler.ArryTypeHandler"/>
-        <result column="from_user" property="fromUser" jdbcType="VARCHAR"/>
-        <result column="owner_user" property="ownerUser" jdbcType="VARCHAR"/>
-        <result column="review_flag" property="reviewFlag" jdbcType="INTEGER"/>
-    </resultMap>
     <insert id="insertSelective" parameterType="com.qunar.qchat.model.SendWhiteModel">
         insert into send_msg_white
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -59,24 +50,5 @@
         </trim>
         ON conflict(from_user,appcode) DO NOTHING;
     </insert>
-    <select id="selectByappcode" resultMap="BaseResultMap" parameterType="java.lang.String">
-    SELECT * FROM send_msg_white where appcode=#{appcode};
-</select>
-    <select id="selectByFromUser" resultMap="BaseResultMap" parameterType="java.lang.String">
-        SELECT * FROM send_msg_white WHERE  from_user =#{fromUser};
-    </select>
-    <select id="selectReview" resultMap="BaseResultMap">
-        select * from send_msg_white where review_flag=0;
-    </select>
-    <delete id="deleteWhiteById" parameterType="java.lang.Integer">
-        delete from send_msg_white where id=#{id};
-    </delete>
-    <update id="updateReviewFlag">
-    UPDATE send_msg_white set review_flag=#{review} where id=#{id};
-</update>
-
-    <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
-        select * from send_msg_white where id=#{id};
-    </select>
 
 </mapper>
