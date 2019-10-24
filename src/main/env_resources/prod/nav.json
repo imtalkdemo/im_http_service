@@ -11,6 +11,7 @@
     "xmpp": "ip",
     "xmppport": 5222,
     "protobufPort": 5202,
+    "websocketPort": 5280,
     "pubkey": "rsa_public_key",
     "xmppmport": 5222,
     "httpurl": "http://ip:8080/newapi",
