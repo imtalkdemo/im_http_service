@@ -18,9 +18,11 @@
     "apiurl": "http://ip:8080/api",
     "shareurl":"http://ip:8080/py/sharemsg",
     "domainhost":"ip",
+    "appWeb": "http://ip:8080/appWeb",
     "resetPwdUrl":"http://ip:8080/static/reterievepassword.html"
   },
   "imConfig": {
+    "isToC": false,
     "RsaEncodeType": 1,
     "showOrganizational": true,
     "mail":"qtalk",
@@ -28,7 +30,7 @@
   },
   "ability": {
    "searchurl": "http://ip:8080/py/search",
-   "new_searchurl":"http://ip:8080/py/search", 
+   "new_searchurl":"http://ip:8080/py/search",
    "showmsgstat": true
   },
   "RNAndroidAbility": {
