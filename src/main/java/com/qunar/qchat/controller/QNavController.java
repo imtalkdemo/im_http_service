@@ -30,13 +30,25 @@ public class QNavController {
             String config = new String(ByteStreams.toByteArray(read));
             ObjectMapper mapper = new ObjectMapper();
             Map map = mapper.readValue(config, Map.class);
+
+            Map baseaddessMap = (Map) map.get("baseaddess");
+            baseaddessMap.put("domain", domain);
+            map.put("baseaddess", baseaddessMap);
+
+            Map loginMap = (Map) map.get("Login");
+            if (nauth != null && nauth.equals("true")) {
+                loginMap.put("loginType", "newpassword");
+            }
+
+            Map imConfigMap = (Map) map.get("imConfig");
+            Boolean isToCDomain = domainService.isToCDomainWithoutNull(domain);
+            imConfigMap.put("isToC", isToCDomain);
+            map.put("imConfig", imConfigMap);
+
             return map;
         } catch (Exception e) {
             LOGGER.error("catch error ", e);
             Map map = new HashMap();
             return map;
         }
-    }
-
-
 }
