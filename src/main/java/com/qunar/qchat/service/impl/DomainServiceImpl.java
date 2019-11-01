@@ -42,4 +42,15 @@ public class DomainServiceImpl implements IDomainService{
     public Integer getDomainNeedApprove(String domain) {
         return hostInfoDao.selectNeedApproveByHost(domain);
     }
+
+
+    @Override
+    public boolean isToCDomainWithoutNull(String domain) {
+        Integer hostType = hostInfoDao.selectHostType(domain);
+        if (hostType == null || hostType == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

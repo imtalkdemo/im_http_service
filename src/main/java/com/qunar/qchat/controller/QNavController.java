@@ -3,13 +3,16 @@ package com.qunar.qchat.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
 import com.qunar.qchat.model.JsonResult;
+import com.qunar.qchat.service.IDomainService;
 import com.qunar.qchat.utils.JsonResultUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.InputStream;
@@ -20,9 +23,11 @@ import java.util.Map;
 @RestController
 public class QNavController {
     private static final Logger LOGGER = LoggerFactory.getLogger(QNavController.class);
+    @Autowired
+    private IDomainService domainService;
 
     @RequestMapping(value = "/qtalk_nav.qunar", method = RequestMethod.GET)
-    public Map qtalkNav() {
+    public Map publicNav(@RequestParam("c") String domain, @RequestParam(value = "nauth", required = false) String nauth) {
         try {
             String Configfile = "nav.json";
             ClassPathResource classPathResource = new ClassPathResource(Configfile);
@@ -51,4 +56,5 @@ public class QNavController {
             Map map = new HashMap();
             return map;
         }
+    }
 }

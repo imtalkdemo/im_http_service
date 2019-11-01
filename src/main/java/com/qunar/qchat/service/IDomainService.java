@@ -20,5 +20,7 @@ public interface IDomainService {
     String getDomainQRCodePath(String domain);
 
     Integer getDomainNeedApprove(String domain);
+    boolean isToCDomainWithoutNull(String domain);
+
 
 }
