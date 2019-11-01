@@ -27,7 +27,7 @@ public class QNavController {
     private IDomainService domainService;
 
     @RequestMapping(value = "/qtalk_nav.qunar", method = RequestMethod.GET)
-    public Map publicNav(@RequestParam("c") String domain, @RequestParam(value = "nauth", required = false) String nauth) {
+    public Map publicNav(@RequestParam(value = "c", required = false) String domain, @RequestParam(value = "nauth", required = false) String nauth) {
         try {
             String Configfile = "nav.json";
             ClassPathResource classPathResource = new ClassPathResource(Configfile);
@@ -37,7 +37,9 @@ public class QNavController {
             Map map = mapper.readValue(config, Map.class);
 
             Map baseaddessMap = (Map) map.get("baseaddess");
-            baseaddessMap.put("domain", domain);
+            if (domain != null) {
+                baseaddessMap.put("domain", domain);
+            }
             map.put("baseaddess", baseaddessMap);
 
             Map loginMap = (Map) map.get("Login");
