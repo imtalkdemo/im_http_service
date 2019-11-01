@@ -7,6 +7,7 @@ import com.qunar.qchat.dao.model.UserPasswordModel;
 import com.qunar.qchat.dao.model.UserPasswordRO;
 import com.qunar.qchat.model.JsonResult;
 import com.qunar.qchat.service.IUserLogin;
+import com.qunar.qchat.utils.JacksonUtils;
 import com.qunar.qchat.utils.JsonResultUtils;
 import com.qunar.qchat.utils.Md5Utils;
 import com.qunar.qchat.utils.RSAEncrypt;
@@ -35,10 +36,9 @@ public class CheckUserLogin {
     @RequestMapping(value = "/newapi/nck/qtlogin.qunar", method = RequestMethod.POST)
     public JsonResult<?> checkLogin(@RequestBody UserPasswordRO param) {
         long start = System.currentTimeMillis();
-        LOGGER.info("check user login u :[{}] h:[{}] p:[{}]", param.getU(), param.getH(), param.getP());
-
-        if (param == null || Strings.isNullOrEmpty(param.getH()) || Strings.isNullOrEmpty(param.getP()) || Strings.isNullOrEmpty(param.getU())) {
-            LOGGER.info("check user login fail u :[{}] h:[{}] p:[{}] info lock cost[{}] ms", param.getU(), param.getH(), param.getP(), System.currentTimeMillis() - start);
+        LOGGER.info("check user login u :[{}] h:[{}] p:[{}] mk [{}]", param.getU(), param.getH(), param.getP(), param.getMk());
+        if (param == null || Strings.isNullOrEmpty(param.getH()) || Strings.isNullOrEmpty(param.getP()) || Strings.isNullOrEmpty(param.getU()) || Strings.isNullOrEmpty(param.getMk())) {
+            LOGGER.info("check user login fail u :[{}]  info lock cost[{}] ms", param.getU(), System.currentTimeMillis() - start);
             return JsonResultUtils.fail(1, "Authentication failed");
         }
         UserPasswordModel userPasswordModel = iUserLogin.checkUserLogin(param);
@@ -48,7 +48,10 @@ public class CheckUserLogin {
         }
         UserCheckTokenModel userCheckTokenModel = new UserCheckTokenModel();
         userCheckTokenModel.setU(userPasswordModel.getUserID());
-        userCheckTokenModel.setT(userPasswordModel.getToken());
+        UserCheckTokenModel.token token = new UserCheckTokenModel.token();
+        token.setMk(param.getMk());
+        token.setToken(userPasswordModel.getToken());
+        userCheckTokenModel.setT(JacksonUtils.obj2String(token));
         userCheckTokenModel.setH(param.getH());
         LOGGER.info("u :[{}] h:[{}] check login finish cost [{}] ms", param.getU(), param.getH(), System.currentTimeMillis() - start);
         return JsonResultUtils.success(userCheckTokenModel);
@@ -57,12 +60,19 @@ public class CheckUserLogin {
     @ResponseBody
     @RequestMapping(value = "/corp/newapi/auth/checktoken.qunar", method = RequestMethod.POST)
     public JsonResult<?> checkLogin(@RequestBody UserCheckTokenModel param) {
-        LOGGER.info("check user token u :[{}] h:[{}] token:[{}] data is {}", param.getU(), param.getH(), param.getT());
+        LOGGER.info("check user token param is [{}]", JacksonUtils.obj2String(param));
         long start = System.currentTimeMillis();
         if (param == null || Strings.isNullOrEmpty(param.getT()) || Strings.isNullOrEmpty(param.getU()) || Strings.isNullOrEmpty(param.getH())) {
             return JsonResultUtils.fail(1, "Authentication failed");
         }
-        if (iUserLogin.checkUserToken(param.getU(), param.getH(), param.getT())) {
+        UserCheckTokenModel.token token = null;
+        try {
+            token = JacksonUtils.string2Obj(param.getT(), UserCheckTokenModel.token.class);
+        } catch (Exception e) {
+            LOGGER.error("check user token parse token fail token is [{}]", param.getT(), e);
+            return JsonResultUtils.fail(1, "Authentication failed");
+        }
+        if (iUserLogin.checkUserToken(param.getU(), param.getH(), token.getToken(), token.getMk())) {
             LOGGER.info("check user token u :[{}] h:[{}] token:[{}] success cost [{}] ms ", param.getU(), param.getH(), param.getT(), System.currentTimeMillis() - start);
             return JsonResultUtils.success();
         }

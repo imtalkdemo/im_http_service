@@ -26,7 +26,12 @@ public class IUserLoginService implements IUserLogin {
     private static final String PASSWORD_SIGN = "p";
     private static final String USERID_SIGN = "u";
     private static final String HOST_SIGN = "h";
+    private static final String MK = "mk";
+
     private static final char SPLITTER_USERID = '\0';
+    private static final String LOGIN_SUFFIX = "login_service";
+
+    private static final String TOKEN_KEY_FORMAT = "%s:%s:%s";// login_service:binz.zhang@ejabhost1:mk
     @Resource
     private IUserInfo iUserInfo;
     @Autowired
@@ -51,7 +56,7 @@ public class IUserLoginService implements IUserLogin {
             return userPasswordModel;
         }
         if (checkPassword(decodeUserLogin, passwordDB.getPasswd(), passwordDB.getPasswdSalt())) {
-            passwordDB.setToken(buildLoginToken(passwordDB.getUserID(), userInput.getH()));
+            passwordDB.setToken(buildLoginToken(passwordDB.getUserID(), userInput.getH(), userInput.getMk()));
             userPasswordModel = passwordDB;
             userPasswordModel.setErrCode(0);
             LOGGER.info("login success user [{}],h:[{}]", userInput.getU(), userInput.getH());
@@ -63,40 +68,32 @@ public class IUserLoginService implements IUserLogin {
     }
 
     @Override
-    public String buildLoginToken(String userID, String host) {
-        StringBuilder stringBuilder = new StringBuilder(userID);
-        stringBuilder.append("@").append(host);
+    public String buildLoginToken(String userID, String host, String mk) {
+        String key = buildLogInTokenKey(userID, host, mk);  //key的形式是 login_service:binz.zhang@ejabhost1:mk
         StringBuilder tokenSB = new StringBuilder();
-        tokenSB.append(UUID.randomUUID()).append("-").append(System.currentTimeMillis());
-        redisUtil.hPut(2, stringBuilder.toString(), tokenSB.toString(), tokenSB.toString(), 7, TimeUnit.DAYS);
-        return tokenSB.toString();
+        //token 生成规则 Md5(uuid + Mk)
+        String tokenBuild = Md5Utils.md5Encode(tokenSB.append(UUID.randomUUID().toString().replaceAll("-", "")).append(mk).append(mk).toString());
+        redisUtil.set(2, key, tokenBuild, 7, TimeUnit.DAYS);
+        return tokenBuild;
     }
 
     @Override
-    public boolean checkUserToken(String userId, String host, String token) {
-        StringBuilder stringBuilder = new StringBuilder(userId);
-        stringBuilder.append("@").append(host);
+    public boolean checkUserToken(String userId, String host, String token, String mk) {
+
+        String key = buildLogInTokenKey(userId, host, mk);  //key的形式是 login_service:binz.zhang@ejabhost1:mk
+
         Integer hostId = iUserInfo.getHostInfo(host);
         Integer hireFlag = iUserInfo.getUserHireFlag(userId, hostId);
-        if(hireFlag==null){
+        if (hireFlag == null || !hireFlag.equals(1)) {
             LOGGER.info("user {} host {} no user in db ", userId, host);
             return false;
+        }
 
-        }
-        if (!hireFlag.equals(1)) {
-            LOGGER.info("user {} host {} have left ", userId, host);
-            return false;
-        }
-        Set<String> tokens = redisUtil.hkeys(2, stringBuilder.toString());
-        if (tokens.size() < 1) {
-            return false;
-        }
-        for (String tokenRedis : tokens) {
-            if (token.equals(tokenRedis)) {
-                redisUtil.hDel(2, stringBuilder.toString(), tokenRedis);
-                redisUtil.hPut(2, stringBuilder.toString(), tokenRedis, tokenRedis, 7, TimeUnit.DAYS);
-                return true;
-            }
+        String tokenRedis = redisUtil.get(2, key, String.class);
+        if (!Strings.isNullOrEmpty(tokenRedis) && tokenRedis.equals(token)) {
+            redisUtil.delete(2, key);
+            redisUtil.set(2, key, tokenRedis, 7, TimeUnit.DAYS);
+            return true;
         }
         return false;
     }
@@ -116,11 +113,26 @@ public class IUserLoginService implements IUserLogin {
             return null;
         }
         try {
-            return RSAEncrypt.decrypt(encodePassword, RSA_PRIVATE);
+            BASE64Decoder decoder = new BASE64Decoder();
+            byte[] baseDecode = decoder.decodeBuffer(encodePassword);
+            return RSAEncrypt.decrypt(baseDecode, RSA_PRIVATE);
         } catch (Exception e) {
             LOGGER.error("decode password error encode password {}", encodePassword, e);
             return null;
         }
+    }
+
+    public static void main(String[] args) {
+        String private_key = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBALLZVcMCUJmWPuA8e8L+/C9ulM38bJbS2Y0KqHRQ+K11NMZmTdRwuq72VYwY9WIv/mWFuiJKiCwPEksd3Cj3UMMGNNfUdu7K46G+y9rJXthzy35qMVb/xHCW+EZLNWmW2GhT6Z32QZ5ny3vdVZZlQQHSLJbHtj9GNTBN2c6U1cPNAgMBAAECgYAeUaWuR2gugT/rd5Vrexp5V/+148Ls1pW2yUXBYjCmByaJM7Kh/vJG0s+xzlFa8dPolgD16zimb2+keE1oTHTOMmS4Bb0QItvh1kDVvqy1DLuceXt2BPXdGwSMokjcJguYrYyd6Kz105vPPQKoyB1sADjnrNDhW4yXAlnN/QFPwQJBANaKlvEx7LS2f7UjiUv7Ulh+t9BmgD52/R3xfaC3R3yK\"0kU9BhawkK3i9SXjxznwT6FZqsIGX7KXjKbPtGW2bCkCQQDVaQi/BaULKWJSmAztXSuny/EE/JNeo1nr7GKpWi1fY8hDXXp81VblPHkOgDFD9z5AAs5lcCJjsGIBn4AyXU8FAkBloBiIACIkKB6uazrqJw6GpN/lc+hjrnGP8YiUzLysHgYkjheIP/MIq218mT0SEOdngtYEOoiyTF9v1Qua8qKhAkB+jrBaH+3VZbBiTLt11Ef8VUxUabi3aeX8rA2CYvD/Xbw4fuoRt661eRxNRiZxKOFosoFV1J8AQWyNi9pJg95FAkEA0uTiMI41VCRjNKae+pSsW8M4Wr0SLknTzBp68UihqJokn068yDQC55bAej+R83PUaQJXp17iYpOyGBPl3ZXRPg==";
+        try {
+            BASE64Decoder decoder = new BASE64Decoder();
+            byte[] baseDecode = decoder.decodeBuffer("hWTQsK6I8cgZgjplTaow65HMUpps3q858Jx1yk6/8CRdHQHAtsihFeVZDKabGfnTvfejviz+281JcUn318cpA6xodHgrKy62ozefH0JSpK208JjFiJC0raAEMv0+VFjJ90Es6XOCLVgfa8z79hImD+jSL0YvjMxyVasV2NIVkg4=");
+            String pwd =  RSAEncrypt.decrypt(baseDecode, private_key);
+            System.out.println(pwd);
+        } catch (Exception e) {
+            LOGGER.error("decode password error encode password {}", e);
+        }
+
     }
 
     @Override
@@ -134,5 +146,11 @@ public class IUserLoginService implements IUserLogin {
         return passWd_db.equals(cleartext_pwd);
     }
 
+
+    private String buildLogInTokenKey(String userId, String host, String mk) {
+        StringBuilder userInfo = new StringBuilder(userId).append("@").append(host);
+        return String.format(TOKEN_KEY_FORMAT, LOGIN_SUFFIX, userInfo.toString(), mk);
+
+    }
 
 }

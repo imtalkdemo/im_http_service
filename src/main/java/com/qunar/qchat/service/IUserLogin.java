@@ -22,14 +22,14 @@ public interface IUserLogin {
      * @param userID
      * @return
      */
-    String buildLoginToken(String userID, String host);
+    String buildLoginToken(String userID, String host,String mk);
 
     /**
      * 校验用户token
      *
      * @return
      */
-    boolean checkUserToken(String userId, String host, String token);
+    boolean checkUserToken(String userId, String host, String token,String mk);
 
 
     /**

@@ -51,8 +51,6 @@ public class RouteMessageController {
             sendWhiteModel.setAppcode(system);
             sendWhiteModel.setFromUser(from);
             sendWhiteModel.setReviewFlag(0);
-            sendWhieMsgService.insertSendInfo(sendWhiteModel);
-
             if(!MessageUtils.checkMsgSize(msgType,content,backupinfo,extendInfo)){
                 return JsonResultUtils.fail(101, "MSG too lang");
             }
