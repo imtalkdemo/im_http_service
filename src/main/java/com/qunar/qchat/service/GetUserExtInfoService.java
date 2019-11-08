@@ -14,7 +14,6 @@ import com.qunar.qchat.model.request.GetLeaderRequest;
 import com.qunar.qchat.model.request.GetMobileRequest;
 import com.qunar.qchat.utils.JacksonUtils;
 import com.qunar.qchat.utils.JsonResultUtils;
-import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

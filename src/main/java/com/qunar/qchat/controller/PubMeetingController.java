@@ -9,7 +9,6 @@ import com.qunar.qchat.model.JsonResult;
 import com.qunar.qchat.model.SchedulingInfo;
 import com.qunar.qchat.model.SchedulingJson;
 import com.qunar.qchat.utils.*;
-import javafx.scene.input.DataFormat;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
