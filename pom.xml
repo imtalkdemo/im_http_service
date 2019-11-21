@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.qunar.qchat</groupId>
-    <artifactId>im_http_service_open</artifactId>
+    <artifactId>im_http_service</artifactId>
     <version>1.0.0</version>
     <packaging>war</packaging>
 
-    <name>im_http_service_open</name>
+    <name>im_http_service</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -581,7 +581,7 @@
 
     <build>
         <defaultGoal>package</defaultGoal>
-        <finalName>im_http_service_open</finalName>
+        <finalName>im_http_service</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
