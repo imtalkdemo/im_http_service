@@ -6,7 +6,7 @@
 ## 项目结构
 im_http_service_open
 - src/main
-    - env_resources（资源文件） 
+    - env_resources（资源文件）
         - beta
         - prod
     - java（代码）
@@ -19,7 +19,7 @@ im_http_service_open
 
 ## 运行方式
 1. >git clone git@github.com:qunarcorp/im_http_service_open.git
-2. >mvn package
+2. >mvn package -Pprod
 3. run on tomcat
 
 
