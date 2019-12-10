@@ -6,6 +6,7 @@ import com.qunar.qchat.dao.model.UserPasswordModel;
 import com.qunar.qchat.model.MucRoomUserInfo;
 import com.qunar.qchat.model.UserInfo;
 import com.qunar.qchat.model.UserInfoParam;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * @author binz.zhang
  */
-@Component
+@Mapper
 public interface IUserInfo {
 
 

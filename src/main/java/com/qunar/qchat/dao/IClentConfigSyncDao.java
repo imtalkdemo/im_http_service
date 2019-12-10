@@ -2,13 +2,14 @@ package com.qunar.qchat.dao;
 
 import com.qunar.qchat.dao.model.ClientConfigModel;
 import com.qunar.qchat.model.request.SetClientConfigRequst;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
 
-@Component
+@Mapper
 public interface IClentConfigSyncDao {
 
     public long selectMaxVersion(

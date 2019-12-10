@@ -1,12 +1,14 @@
 package com.qunar.qchat.dao;
 
 import com.qunar.qchat.dao.model.VCardInfoModel;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 /**
  * @auth dongzd.zhang
  * @Date 2018/11/5 17:46
  */
+@Mapper
 public interface IVCardInfoDao {
 
     /**

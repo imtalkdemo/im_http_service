@@ -1,12 +1,14 @@
 package com.qunar.qchat.dao;
 
 import com.qunar.qchat.dao.model.HostInfoModel;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 /**
  * @auth dongzd.zhang
  * @Date 2018/11/6 11:02
  */
+@Mapper
 public interface IHostInfoDao {
 
 

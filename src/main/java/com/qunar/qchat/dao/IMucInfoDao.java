@@ -2,11 +2,13 @@ package com.qunar.qchat.dao;
 
 import com.qunar.qchat.dao.model.MucIncrementInfo;
 import com.qunar.qchat.dao.model.MucInfoModel;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
 
+@Mapper
 public interface IMucInfoDao {
 
     List<MucIncrementInfo> selectMucIncrementInfo(

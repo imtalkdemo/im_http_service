@@ -4,6 +4,7 @@ import com.qunar.qchat.dao.model.QGetMsg;
 import com.qunar.qchat.dao.model.QGetMucMsg;
 import com.qunar.qchat.dao.model.QMsgReadFlag;
 import com.qunar.qchat.dao.model.QMucTime;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 /**
  * Created by admin on 13/07/2017.
  */
-@Component
+@Mapper
 public interface IGetMsgDao {
 
     public List<QGetMsg> selectMsgbyTime(
